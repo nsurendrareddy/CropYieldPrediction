@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Crop Yield Prediction - Advanced Analytics</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --warning-gradient: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent-color: #00d4ff;
+            --glow-color: rgba(0, 212, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #533483);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Particle System */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Header */
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--success-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .status-indicators {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+
+        /* Left Panel - Prediction Form */
+        .prediction-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .panel-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .panel-title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Advanced Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px 50px 15px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px var(--glow-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            font-size: 18px;
+        }
+
+        .range-slider {
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .range-input {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* Live Preview */
+        .live-preview {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .preview-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .preview-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            animation: countUp 0.5s ease;
+        }
+
+        @keyframes countUp {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .preview-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Predict Button */
+        .predict-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .predict-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .predict-btn:hover::before {
+            left: 100%;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(17, 153, 142, 0.4);
+        }
+
+        .predict-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Right Panel - Analytics */
+        .analytics-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .analytics-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--accent-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin-top: 10px;
+        }
+
+        .mini-chart {
+            height: 100px;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .metric-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* Weather Widget */
+        .weather-widget {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .weather-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .weather-icon {
+            font-size: 24px;
+            color: var(--accent-color);
+        }
+
+        .weather-data {
+            flex: 1;
+        }
+
+        .weather-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .weather-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Results Modal */
+        .results-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .results-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .results-main {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: var(--success-gradient);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .result-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .loading-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: var(--accent-color);
+            border-radius: 2px;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .status-indicators {
+                flex-wrap: wrap;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .weather-widget {
+                grid-template-columns: 1fr;
+            }
+
+            .results-main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        /* Selection Styling */
+        ::selection {
+            background: var(--accent-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="particles" id="particles"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>CropAI Pro</h1>
+                    <p>Advanced Agricultural Intelligence</p>
+                </div>
+            </div>
+            <div class="status-indicators">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>AI Model Active</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-cloud"></i>
+                    <span>Weather Live</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics Ready</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Left Panel - Prediction Form -->
+        <div class="prediction-panel">
+            <div class="panel-header">
+                <div class="panel-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="panel-title">
+                    <h2>AI Yield Prediction</h2>
+                    <p>Real-time crop yield analysis powered by machine learning</p>
+                </div>
+            </div>
+
+            <form id="prediction-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="crop">
+                            <i class="fas fa-seedling"></i> Crop Type
+                        </label>
+                        <div class="input-wrapper">
+                            <select id="crop" name="crop" required>
+                                <option value="">Select Crop</option>
+                                <option value="Rice">🌾 Rice</option>
+                                <option value="Wheat">🌾 Wheat</option>
+                                <option value="Maize">🌽 Maize</option>
+                                <option value="Barley">🌾 Barley</option>
+                                <option value="Soybean">🫘 Soybean</option>
+                                <option value="Cotton">🌿 Cotton</option>
+                            </select>
+                            <i class="fas fa-chevron-down input-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rainfall">
+                            <i class="fas fa-cloud-rain"></i> Rainfall (mm)
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="number" id="rainfall" name="rainfall" step="0.1" min="0" max="3000" required>
+                            <i class="fas fa-tint input-icon"></i>
+                        </div>
+                        <div class="range-slider">
+                            <input type="range" id="rainfall-range" class="range-input" min="0" max="2000" step="10">
+                            <div class="range-values">
+                                <span>0mm</span>
+                                <span>2000mm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="temperature">
+                            <i class="fas fa-thermometer-half"></i> Temperature (°C)
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="number" id="temperature" name="temperature" step="0.1" min="-10" max="50" required>
+                            <i class="fas fa-temperature-high input-icon"></i>
+                        </div>
+                        <div class="range-slider">
+                            <input type="range" id="temp-range" class="range-input" min="0" max="45" step="1">
+                            <div class="range-values">
+                                <span>0°C</span>
+                                <span>45°C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="humidity">
+                            <i class="fas fa-eye-dropper"></i> Humidity (%)
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="number" id="humidity" name="humidity" step="0.1" min="0" max="100" required>
+                            <i class="fas fa-percentage input-icon"></i>
+                        </div>
+                        <div class="range-slider">
+                            <input type="range" id="humidity-range" class="range-input" min="20" max="100" step="1">
+                            <div class="range-values">
+                                <span>20%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">
+                            <i class="fas fa-expand-arrows-alt"></i> Area (hectares)
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="number" id="area" name="area" step="0.01" min="0.01" max="1000" required>
+                            <i class="fas fa-map input-icon"></i>
+                        </div>
+                        <div class="range-slider">
+                            <input type="range" id="area-range" class="range-input" min="0.1" max="50" step="0.1">
+                            <div class="range-values">
+                                <span>0.1ha</span>
+                                <span>50ha</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Preview -->
+                <div class="live-preview" id="live-preview" style="display: none;">
+                    <div class="preview-title">
+                        <i class="fas fa-eye"></i>
+                        <span>Live Preview</span>
+                    </div>
+                    <div class="preview-value" id="preview-yield">0</div>
+                    <div class="preview-label">kg/hectare (estimated)</div>
+                </div>
+
+                <button type="submit" class="predict-btn" id="predict-btn">
+                    <i class="fas fa-rocket"></i>
+                    Analyze & Predict
+                </button>
+            </form>
+        </div>
+
+        <!-- Right Panel - Analytics -->
+        <div class="analytics-panel">
+            <!-- Real-time Metrics -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <span>Performance Metrics</span>
+                    </div>
+                    <button class="refresh-btn" onclick="updateMetrics()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-value" id="model-accuracy">94.2%</div>
+                        <div class="metric-label">Model Accuracy</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="predictions-today">247</div>
+                        <div class="metric-label">Predictions Today</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="avg-yield">3.2k</div>
+                        <div class="metric-label">Avg Yield kg/ha</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="response-time">0.3s</div>
+                        <div class="metric-label">Response Time</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather Conditions -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fas fa-cloud-sun"></i>
+                        </div>
+                        <span>Weather Conditions</span>
+                    </div>
+                </div>
+                <div class="weather-widget">
+                    <div class="weather-item">
+                        <div class="weather-icon">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div class="weather-data">
+                            <div class="weather-value" id="current-temp">26°C</div>
+                            <div class="weather-label">Temperature</div>
+                        </div>
+                    </div>
+                    <div class="weather-item">
+                        <div class="weather-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="weather-data">
+                            <div class="weather-value" id="current-humidity">65%</div>
+                            <div class="weather-label">Humidity</div>
+                        </div>
+                    </div>
+                    <div class="weather-item">
+                        <div class="weather-icon">
+                            <i class="fas fa-cloud-rain"></i>
+                        </div>
+                        <div class="weather-data">
+                            <div class="weather-value" id="current-rainfall">12mm</div>
+                            <div class="weather-label">Today's Rain</div>
+                        </div>
+                    </div>
+                    <div class="weather-item">
+                        <div class="weather-icon">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <div class="weather-data">
+                            <div class="weather-value" id="current-wind">8 km/h</div>
+                            <div class="weather-label">Wind Speed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yield Trends Chart -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span>Yield Trends</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="yield-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Crop Distribution -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <span>Crop Distribution</span>
+                    </div>
+                </div>
+                <div class="chart-container mini-chart">
+                    <canvas id="crop-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Market Insights -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <span>Market Insights</span>
+                    </div>
+                </div>
+                <div class="market-grid">
+                    <div class="market-item">
+                        <div class="market-crop">Rice</div>
+                        <div class="market-price">₹2,150/quintal</div>
+                        <div class="market-change positive">+2.3%</div>
+                    </div>
+                    <div class="market-item">
+                        <div class="market-crop">Wheat</div>
+                        <div class="market-price">₹2,050/quintal</div>
+                        <div class="market-change negative">-1.1%</div>
+                    </div>
+                    <div class="market-item">
+                        <div class="market-crop">Maize</div>
+                        <div class="market-price">₹1,875/quintal</div>
+                        <div class="market-change positive">+0.8%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div class="results-modal" id="results-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="results-header">
+                <h2>🎯 Prediction Results</h2>
+                <p>AI-powered crop yield analysis complete</p>
+            </div>
+
+            <div class="results-main">
+                <div class="result-card">
+                    <div class="result-value" id="modal-yield-per-hectare">0</div>
+                    <div class="result-label">kg per hectare</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-value" id="modal-total-yield">0</div>
+                    <div class="result-label">Total yield (kg)</div>
+                </div>
+            </div>
+
+            <!-- Detailed Analysis -->
+            <div class="analysis-section">
+                <h3>📊 Detailed Analysis</h3>
+                <div class="analysis-grid">
+                    <div class="analysis-item">
+                        <div class="analysis-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <div class="analysis-content">
+                            <div class="analysis-title">Crop Suitability</div>
+                            <div class="analysis-value" id="crop-suitability">Excellent</div>
+                            <div class="analysis-bar">
+                                <div class="analysis-progress" id="suitability-progress" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-item">
+                        <div class="analysis-icon">
+                            <i class="fas fa-cloud-rain"></i>
+                        </div>
+                        <div class="analysis-content">
+                            <div class="analysis-title">Weather Score</div>
+                            <div class="analysis-value" id="weather-score">Good</div>
+                            <div class="analysis-bar">
+                                <div class="analysis-progress" id="weather-progress" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-item">
+                        <div class="analysis-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="analysis-content">
+                            <div class="analysis-title">Yield Potential</div>
+                            <div class="analysis-value" id="yield-potential">High</div>
+                            <div class="analysis-bar">
+                                <div class="analysis-progress" id="potential-progress" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="recommendations-section">
+                <h3>💡 AI Recommendations</h3>
+                <div class="recommendations-list" id="recommendations-list">
+                    <div class="recommendation-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Current conditions are optimal for your selected crop</span>
+                    </div>
+                    <div class="recommendation-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Monitor humidity levels for disease prevention</span>
+                    </div>
+                    <div class="recommendation-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Best planting window: Next 2-3 weeks</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="modal-actions">
+                <button class="action-btn secondary" onclick="downloadReport()">
+                    <i class="fas fa-download"></i>
+                    Download Report
+                </button>
+                <button class="action-btn primary" onclick="shareResults()">
+                    <i class="fas fa-share"></i>
+                    Share Results
+                </button>
+                <button class="action-btn success" onclick="saveToHistory()">
+                    <i class="fas fa-save"></i>
+                    Save to History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loading-text">Analyzing crop conditions...</div>
+            <div class="loading-progress">
+                <div class="loading-bar"></div>
+            </div>
+            <div class="loading-details" id="loading-details">
+                Initializing AI models...
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div class="notification-container" id="notification-container"></div>
+
+    <script>
+        // Global variables
+        let yieldChart, cropChart;
+        let currentPrediction = null;
+        let isLivePreviewEnabled = false;
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupRangeSliders();
+            setupLivePreview();
+            setupFormValidation();
+            initializeParticles();
+            startRealTimeUpdates();
+            
+            // Show welcome notification
+            showNotification('🌟 Welcome to CropAI Pro! Start by selecting your crop type.', 'info');
+        });
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Yield Trends Chart
+            const yieldCtx = document.getElementById('yield-chart').getContext('2d');
+            yieldChart = new Chart(yieldCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Average Yield',
+                        data: [3200, 3400, 3100, 3600, 3800, 3500],
+                        borderColor: '#00d4ff',
+                        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#00d4ff',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#b0b0b0' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#b0b0b0' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Crop Distribution Chart
+            const cropCtx = document.getElementById('crop-chart').getContext('2d');
+            cropChart = new Chart(cropCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Rice', 'Wheat', 'Maize', 'Barley', 'Soybean', 'Cotton'],
+                    datasets: [{
+                        data: [30, 25, 20, 10, 10, 5],
+                        backgroundColor: [
+                            '#00d4ff', '#00ff88', '#ff6b6b', '#ffd93d',
+                            '#6c5ce7', '#fd79a8'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#b0b0b0',
+                                font: { size: 10 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Setup Range Sliders
+        function setupRangeSliders() {
+            const ranges = [
+                { input: 'rainfall', range: 'rainfall-range' },
+                { input: 'temperature', range: 'temp-range' },
+                { input: 'humidity', range: 'humidity-range' },
+                { input: 'area', range: 'area-range' }
+            ];
+
+            ranges.forEach(({ input, range }) => {
+                const inputEl = document.getElementById(input);
+                const rangeEl = document.getElementById(range);
+
+                // Sync input to range
+                inputEl.addEventListener('input', () => {
+                    rangeEl.value = inputEl.value;
+                    updateLivePreview();
+                });
+
+                // Sync range to input
+                rangeEl.addEventListener('input', () => {
+                    inputEl.value = rangeEl.value;
+                    updateLivePreview();
+                });
+            });
+        }
+
+        // Setup Live Preview
+        function setupLivePreview() {
+            const form = document.getElementById('prediction-form');
+            const inputs = form.querySelectorAll('input, select');
+
+            inputs.forEach(input => {
+                input.addEventListener('input', updateLivePreview);
+            });
+        }
+
+        // Update Live Preview
+        function updateLivePreview() {
+            const crop = document.getElementById('crop').value;
+            const rainfall = parseFloat(document.getElementById('rainfall').value);
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const humidity = parseFloat(document.getElementById('humidity').value);
+            const area = parseFloat(document.getElementById('area').value);
+
+            if (crop && rainfall && temperature && humidity && area) {
+                // Simulate quick prediction for live preview
+                const baseYields = {
+                    'Rice': 4000,
+                    'Wheat': 3000,
+                    'Maize': 5000,
+                    'Barley': 2500,
+                    'Soybean': 2800,
+                    'Cotton': 1800
+                };
+
+                const baseYield = baseYields[crop] || 3000;
+                const rainfallFactor = Math.min(rainfall / 600, 1.5);
+                const tempFactor = temperature > 0 ? Math.min(temperature / 25, 1.3) : 0.5;
+                const humidityFactor = Math.min(humidity / 70, 1.2);
+
+                const estimatedYield = Math.round(baseYield * rainfallFactor * tempFactor * humidityFactor);
+
+                document.getElementById('preview-yield').textContent = estimatedYield.toLocaleString();
+                document.getElementById('live-preview').style.display = 'block';
+                isLivePreviewEnabled = true;
+            } else {
+                document.getElementById('live-preview').style.display = 'none';
+                isLivePreviewEnabled = false;
+            }
+        }
+
+        // Form Validation
+        function setupFormValidation() {
+            const form = document.getElementById('prediction-form');
+            const inputs = form.querySelectorAll('input[required], select[required]');
+
+            inputs.forEach(input => {
+                input.addEventListener('blur', validateInput);
+                input.addEventListener('input', clearValidationError);
+            });
+        }
+
+        function validateInput(e) {
+            const input = e.target;
+            const value = input.value;
+
+            // Remove existing validation styles
+            input.classList.remove('error', 'success');
+
+            if (!value) {
+                input.classList.add('error');
+                return false;
+            }
+
+            // Specific validations
+            if (input.type === 'number') {
+                const num = parseFloat(value);
+                const min = parseFloat(input.min);
+                const max = parseFloat(input.max);
+
+                if (num < min || num > max) {
+                    input.classList.add('error');
+                    showNotification(`${input.previousElementSibling.textContent} must be between ${min} and ${max}`, 'error');
+                    return false;
+                }
+            }
+
+            input.classList.add('success');
+            return true;
+        }
+
+        function clearValidationError(e) {
+            e.target.classList.remove('error');
+        }
+
+        // Particle System
+        function initializeParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.cssText = `
+                    position: absolute;
+                    width: ${Math.random() * 4 + 1}px;
+                    height: ${Math.random() * 4 + 1}px;
+                    background: rgba(0, 212, 255, ${Math.random() * 0.5 + 0.1});
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation: float ${Math.random() * 20 + 10}s infinite linear;
+                `;
+                particlesContainer.appendChild(particle);
+            }
+
+            // Add CSS animation for particles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0% { transform: translateY(100vh) scale(0); }
+                    50% { transform: translateY(50vh) scale(1); }
+                    100% { transform: translateY(-100vh) scale(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Real-time Updates
+        function startRealTimeUpdates() {
+            // Update metrics every 30 seconds
+            setInterval(updateMetrics, 30000);
+            
+            // Update weather every 5 minutes
+            setInterval(updateWeatherData, 300000);
+            
+            // Update charts every minute
+            setInterval(updateCharts, 60000);
+        }
+
+        function updateMetrics() {
+            const metrics = {
+                'model-accuracy': (Math.random() * 5 + 90).toFixed(1) + '%',
+                'predictions-today': Math.floor(Math.random() * 100 + 200),
+                'avg-yield': (Math.random() * 2 + 2).toFixed(1) + 'k',
+                'response-time': (Math.random() * 0.5 + 0.1).toFixed(1) + 's'
+            };
+
+            Object.entries(metrics).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.animation = 'countUp 0.5s ease';
+                    setTimeout(() => {
+                        element.textContent = value;
+                    }, 100);
+                }
+            });
+        }
+
+        function updateWeatherData() {
+            const weather = {
+                'current-temp': Math.floor(Math.random() * 15 + 20) + '°C',
+                'current-humidity': Math.floor(Math.random() * 30 + 50) + '%',
+                'current-rainfall': Math.floor(Math.random() * 20) + 'mm',
+                'current-wind': Math.floor(Math.random() * 15 + 5) + ' km/h'
+            };
+
+            Object.entries(weather).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = value;
+            });
+        }
+
+        function updateCharts() {
+            // Update yield chart with new data
+            if (yieldChart) {
+                const newData = Array.from({length: 6}, () => Math.floor(Math.random() * 1000 + 3000));
+                yieldChart.data.datasets[0].data = newData;
+                yieldChart.update('quiet');
+            }
+        }
+
+        // Form Submission
+        document.getElementById('prediction-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validate all inputs
+            const inputs = this.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!validateInput({ target: input })) {
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                showNotification('❌ Please fix validation errors before submitting', 'error');
+                return;
+            }
+
+            const formData = new FormData(this);
+            
+            showLoadingOverlay();
+            
+            try {
+                // Simulate analysis steps
+                await simulateAnalysis();
+                
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentPrediction = data;
+                    showResults(data);
+                    showNotification('✅ Prediction completed successfully!', 'success');
+                } else {
+                    throw new Error(data.error || 'Prediction failed');
+                }
+            } catch (error) {
+                console.error('Prediction error:', error);
+                showNotification('❌ ' + error.message, 'error');
+            } finally {
+                hideLoadingOverlay();
+            }
+        });
+
+        // Loading Animation
+        async function simulateAnalysis() {
+            const steps = [
+                'Initializing AI models...',
+                'Analyzing environmental conditions...',
+                'Processing crop characteristics...',
+                'Calculating yield predictions...',
+                'Generating recommendations...',
+                'Finalizing results...'
+            ];
+
+            for (let i = 0; i < steps.length; i++) {
+                document.getElementById('loading-details').textContent = steps[i];
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+        }
+
+        function showLoadingOverlay() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoadingOverlay() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // Results Modal
+        function showResults(data) {
+            document.getElementById('modal-yield-per-hectare').textContent = data.yield_per_hectare.toLocaleString();
+            document.getElementById('modal-total-yield').textContent = data.total_yield.toLocaleString();
+            
+            // Update analysis scores
+            updateAnalysisScores(data);
+            updateRecommendations(data);
+            
+            document.getElementById('results-modal').classList.add('show');
+        }
+
+        function updateAnalysisScores(data) {
+            // Calculate scores based on prediction data
+            const yieldScore = Math.min((data.yield_per_hectare / 4000) * 100, 100);
+            const weatherScore = (data.rainfall > 300 && data.temperature > 15 && data.humidity > 40) ? 85 : 65;
+            const suitabilityScore = yieldScore > 75 ? 90 : 70;
+
+            document.getElementById('suitability-progress').style.width = suitabilityScore + '%';
+            document.getElementById('weather-progress').style.width = weatherScore + '%';
+            document.getElementById('potential-progress').style.width = yieldScore + '%';
+
+            document.getElementById('crop-suitability').textContent = suitabilityScore > 80 ? 'Excellent' : 'Good';
+            document.getElementById('weather-score').textContent = weatherScore > 80 ? 'Excellent' : 'Good';
+            document.getElementById('yield-potential').textContent = yieldScore > 80 ? 'High' : 'Medium';
+        }
+
+        function updateRecommendations(data) {
+            const recommendations = [];
+            
+            if (data.yield_per_hectare > 3500) {
+                recommendations.push('✅ Excellent yield potential detected');
+            }
+            
+            if (data.rainfall < 400) {
+                recommendations.push('💧 Consider supplemental irrigation');
+            }
+            
+            if (data.humidity > 80) {
+                recommendations.push('🔍 Monitor for fungal diseases');
+            }
+            
+            if (data.temperature > 30) {
+                recommendations.push('🌡️ Provide shade during peak hours');
+            } else {
+                recommendations.push('🌱 Temperature conditions are optimal');
+            }
+
+            const container = document.getElementById('recommendations-list');
+            container.innerHTML = recommendations.map(rec => `
+                <div class="recommendation-item">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>${rec}</span>
+                </div>
+            `).join('');
+        }
+
+        function closeModal() {
+            document.getElementById('results-modal').classList.remove('show');
+        }
+
+        // Modal Actions
+        function downloadReport() {
+            if (!currentPrediction) return;
+            
+            const report = {
+                timestamp: new Date().toISOString(),
+                prediction: currentPrediction,
+                analysis: 'Generated by CropAI Pro'
+            };
+            
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `crop-yield-report-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('📄 Report downloaded successfully!', 'success');
+        }
+
+        function shareResults() {
+            if (!currentPrediction) return;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'CropAI Prediction Results',
+                    text: `Predicted yield: ${currentPrediction.yield_per_hectare} kg/hectare for ${currentPrediction.crop}`,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback to clipboard
+                const text = `CropAI Prediction: ${currentPrediction.yield_per_hectare} kg/hectare for ${currentPrediction.crop}`;
+                navigator.clipboard.writeText(text);
+                showNotification('📋 Results copied to clipboard!', 'info');
+            }
+        }
+
+        function saveToHistory() {
+            if (!currentPrediction) return;
+            
+            const history = JSON.parse(localStorage.getItem('cropai-history') || '[]');
+            history.unshift({
+                ...currentPrediction,
+                timestamp: new Date().toISOString(),
+                id: Date.now()
+            });
+            
+            // Keep only last 10 predictions
+            localStorage.setItem('cropai-history', JSON.stringify(history.slice(0, 10)));
+            showNotification('💾 Prediction saved to history!', 'success');
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span>${message}</span>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        document.getElementById('predict-btn').click();
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        location.reload();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+
+    <!-- Additional CSS for new components -->
+    <style>
+        /* Market Insights */
+        .market-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .market-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .market-crop {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .market-price {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .market-change {
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .market-change.positive {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .market-change.negative {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        /* Analysis Section */
+        .analysis-section {
+            margin: 30px 0;
+        }
+
+        .analysis-section h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analysis-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .analysis-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .analysis-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+
+        .analysis-content {
+            flex: 1;
+        }
+
+        .analysis-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .analysis-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .analysis-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .analysis-progress {
+            height: 100%;
+            background: var(--success-gradient);
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        /* Recommendations */
+        .recommendations-section {
+            margin: 30px 0;
+        }
+
+        .recommendations-section h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recommendations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .recommendation-item i {
+            color: var(--accent-color);
+            font-size: 16px;
+        }
+
+        /* Modal Actions */
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight:
