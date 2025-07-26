@@ -370,13 +370,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **Agricultural Research**: Domain knowledge sources
 - **Open Source Community**: Tools and libraries
 
-## 📞 Support
-
-For questions, issues, or contributions:
-- Create an issue on GitHub
-- Email: your-email@domain.com
-- Documentation: Check the README and code comments
-
----
 
 **Happy Farming! 🌾**
